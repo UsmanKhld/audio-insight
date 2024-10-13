@@ -10,3 +10,6 @@ langchain_groq
 streamlit
 moviepy
 openai
+streamlit-lottie
+pyaudio
+numpy
