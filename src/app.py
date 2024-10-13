@@ -44,6 +44,13 @@ col1, col2 = st.columns(2)
 pc = Pinecone(os.getenv("PINECONE_API_KEY"))
 index = pc.Index("podcast-transcripts")
 
+# At the beginning of your script, after other initializations
+if "summary" not in st.session_state:
+    st.session_state.summary = ""
+
+if "combined_transcription" not in st.session_state:
+    st.session_state.combined_transcription = ""
+
 with col1:
     # Upload audio file
     uploaded_file = st.file_uploader("Upload an MP3 file", type="mp3")
@@ -104,6 +111,7 @@ with col1:
 
             # Combine all transcriptions into a single text
             combined_transcription = " ".join(st.session_state.transcriptions)
+            st.session_state.combined_transcription = combined_transcription  # Store in session state
             
             # Split the combined transcription into smaller chunks
             transcription_chunks = list(split_into_chunks(combined_transcription))
@@ -112,8 +120,10 @@ with col1:
             documents = [Document(page_content=chunk) for chunk in transcription_chunks]
             st.session_state.docsearch = store_embeddings(documents)
 
-            with st.expander("View Full transcription"):
-                st.write(combined_transcription)
+            # After creating the combined transcription
+    with st.expander("View Full transcription"):
+        st.write(st.session_state.combined_transcription)
+
             # st.write(f"Transcription: {combined_transcription[:500]}...")  # Show the first 500 characters
 
 
@@ -164,7 +174,11 @@ with col2:
             summary_transcripts = query_vector_database(st.session_state.docsearch, "Can you summarize the lecture")
             summary_prompt = f"You are to give a summary of this transcript:\n\n{summary_transcripts}\n\n"
             summary_response = gpt4_chat_completion(summary_prompt)
-            st.write(f"{summary_response}")
+            st.session_state.summary = summary_response
 
+    if st.session_state.summary:
+        st.write("### Summary:")
+        st.write(st.session_state.summary)
 # User query logic
+
 
