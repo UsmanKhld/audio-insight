@@ -11,16 +11,35 @@ def load_lottieurl(url):
     return r.json()
 
 def uiHeroSection():
-    st.set_page_config(page_title="Audio-Insights", page_icon="robot_face")
+    st.set_page_config(page_title="Audio-Insights", page_icon="🤖", layout="wide")
+
+    # Apply custom CSS for column layout with different widths
     st.write(
         """<style>
-        [data-testid="column"] {
-            width: calc(50% - 1rem);
-            flex: 1 1 calc(50% - 1rem);
-            min-width: calc(50% - 1rem);
+        [data-testid="column"]:nth-child(1) {
+            width: 35%;  /* Left column width */
+            flex: 1 1 35%;
+            min-width: 35%;
             display: flex;
-            align-items: flex-end;
+            align-items: flex-start;
         }
+        [data-testid="column"]:nth-child(2) {
+            width: 65%;  /* Right column width */
+            flex: 1 1 65%;
+            min-width: 65%;
+            display: flex;
+            align-items: flex-start;
+        }
+        .big-title {
+        font-size: 3em;
+        font-weight: bold;
+        color: #FFFFFF;
+        }
+
+        .big-title span {
+        color: #FFA500;
+        }
+    
         </style>""",
         unsafe_allow_html=True,
     )
