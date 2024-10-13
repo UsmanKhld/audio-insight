@@ -85,7 +85,9 @@ with col1:
     # When a new file is uploaded, reset the session state and clear Pinecone index
     if uploaded_file is not None and uploaded_file.name != st.session_state.last_uploaded_file:
         # Clear Pinecone index
-        index.delete(delete_all=True)
+        stats = index.describe_index_stats()
+        if stats.total_vector_count > 0:
+            index.delete(delete_all=True)
         
         # Reset session state
         st.session_state.transcriptions = []
@@ -168,7 +170,7 @@ with col1:
         start_transcription()  # Start transcription process
         st.session_state.recording = True  # Set recording state to True
     elif stop_button and st.session_state.recording:
-        stop_transcription()  # Stop transcription process
+        st.session_state.docsearch = stop_transcription()  # Stop transcription process
         st.session_state.recording = False  # Set recording state to False
 
 # Show the correct state
