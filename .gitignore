@@ -4,3 +4,4 @@ chunks
 env
 .python-version
 __pycache__
+venv
