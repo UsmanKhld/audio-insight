@@ -44,6 +44,10 @@ col1, col2 = st.columns(2)
 pc = Pinecone(os.getenv("PINECONE_API_KEY"))
 index = pc.Index("podcast-transcripts")
 
+# At the beginning of your script, add this to your other session state initializations
+if "user_question_key" not in st.session_state:
+    st.session_state.user_question_key = 0
+
 # At the beginning of your script, after other initializations
 if "summary" not in st.session_state:
     st.session_state.summary = ""
@@ -87,6 +91,8 @@ with col1:
         st.session_state.transcriptions = []
         st.session_state.docsearch = None
         st.session_state.last_uploaded_file = uploaded_file.name
+        st.session_state.summary = ""  # Reset the summary when a new file is uploaded
+        st.session_state.combined_transcription = ""  # Reset the combined transcription
 
         # Process the new file
         filepath = os.path.join(mp3_file_folder, uploaded_file.name)
@@ -121,6 +127,10 @@ with col1:
             st.session_state.docsearch = store_embeddings(documents)
 
             # After creating the combined transcription
+
+        # Increment the key to force a new text input widget
+        st.session_state.user_question_key += 1
+
     with st.expander("View Full transcription"):
         st.write(st.session_state.combined_transcription)
 
@@ -129,7 +139,7 @@ with col1:
 
 
     # User query
-    user_question = st.text_input("Ask a question about the podcast")
+    user_question = st.text_input("Ask a question about the podcast", key=f"user_question_{st.session_state.user_question_key}")
     if user_question:
         if st.session_state.docsearch is None:
             st.error("No aduio uploaded or recorded. Please upload an MP3 file or record audio first.")
@@ -168,7 +178,7 @@ with col1:
 with col2:
     if st.button("Summarize"):
         if st.session_state.docsearch is None:
-            st.error("No aduio uploaded or recorded. Please upload an MP3 file or record audio first.")
+            st.error("No audio uploaded or recorded. Please upload an MP3 file or record audio first.")
         else:
             st.write("### Summary:")
             summary_transcripts = query_vector_database(st.session_state.docsearch, "Can you summarize the lecture")
@@ -177,8 +187,11 @@ with col2:
             st.session_state.summary = summary_response
 
     if st.session_state.summary:
-        st.write("### Summary:")
         st.write(st.session_state.summary)
+    else:
+        st.write("No summary available. Click 'Summarize' to generate a summary.")
+
 # User query logic
+
 
 
