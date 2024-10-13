@@ -8,6 +8,7 @@ from podcast.embedding import store_embeddings
 from podcast.question_answer import query_vector_database
 from langchain.docstore.document import Document
 from live_audio_transcription.stream_audio import start_transcription, stop_transcription
+from pinecone import Pinecone
 
 # custom imports
 from uiLayouts import *
@@ -39,6 +40,10 @@ with st.sidebar:
 
 col1, col2 = st.columns(2)
 
+# Initialize Pinecone client outside the file upload logic
+pc = Pinecone(os.getenv("PINECONE_API_KEY"))
+index = pc.Index("podcast-transcripts")
+
 with col1:
     # Upload audio file
     uploaded_file = st.file_uploader("Upload an MP3 file", type="mp3")
@@ -66,20 +71,22 @@ with col1:
         return response.choices[0].message.content
 
     translate_to_english = st.checkbox("Translate to English")
-    # When a new file is uploaded, reset the session state for transcriptions and embeddings
-    if uploaded_file is not None:
-        # Check if the new file is different from the last processed file
-        #if uploaded_file.name != st.session_state.last_uploaded_file:
-        st.session_state.transcriptions = []  # Reset transcriptions
-        st.session_state.docsearch = None  # Reset embeddings
-        st.session_state.last_uploaded_file = uploaded_file.name  # Update the last file
+    # When a new file is uploaded, reset the session state and clear Pinecone index
+    if uploaded_file is not None and uploaded_file.name != st.session_state.last_uploaded_file:
+        # Clear Pinecone index
+        index.delete(delete_all=True)
+        
+        # Reset session state
+        st.session_state.transcriptions = []
+        st.session_state.docsearch = None
+        st.session_state.last_uploaded_file = uploaded_file.name
 
-        # Save the uploaded file
+        # Process the new file
         filepath = os.path.join(mp3_file_folder, uploaded_file.name)
         with open(filepath, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        # Optional: To save and chunk the audio file
+        # Process and transcribe audio
         audio = AudioFileClip(filepath)
         chunk_length = 60  # seconds
 
@@ -160,3 +167,4 @@ with col2:
             st.write(f"{summary_response}")
 
 # User query logic
+
