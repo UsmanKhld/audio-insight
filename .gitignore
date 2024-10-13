@@ -3,3 +3,4 @@ uploaded_files
 chunks
 env
 .python-version
+__pycache__

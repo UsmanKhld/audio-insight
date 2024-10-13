@@ -12,8 +12,5 @@ def audio_to_text(filepath):
         transalation = client.audio.translations.create(
             file = (filepath, file.read()),
             model = 'whisper-large-v3'
-            
         )
     return transalation.text
-
-
