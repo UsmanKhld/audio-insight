@@ -75,7 +75,7 @@ def start_recording():
         chunk_path = save_chunk_wav(audio_chunk, chunk_number)
         chunk_number+=1
 
-        transcription = audio_to_text(chunk_path)
+        transcription = audio_to_text(chunk_path, translate_to_english=True)
         full_text += transcription
         if(len(full_text) > 4096):
             text_chunks = split_text_into_chunks(full_text)
@@ -94,6 +94,7 @@ def start_recording():
 def start_transcription():
     st.session_state.recording = True
     start_recording()
+    st.write("Recording in progress...")
 
 def stop_transcription():
     """Function to stop recording."""
@@ -101,3 +102,4 @@ def stop_transcription():
     st.write("Recording stopped.")
     documents = [Document(page_content=chunk) for chunk in transcription_chunks]
     st.session_state.docsearch = store_embeddings(documents)
+

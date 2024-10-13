@@ -105,7 +105,7 @@ with col1:
             documents = [Document(page_content=chunk) for chunk in transcription_chunks]
             st.session_state.docsearch = store_embeddings(documents)
 
-            with st.expander("View FUll transcription"):
+            with st.expander("View Full transcription"):
                 st.write(combined_transcription)
             # st.write(f"Transcription: {combined_transcription[:500]}...")  # Show the first 500 characters
 
@@ -113,34 +113,50 @@ with col1:
 
     # User query
     user_question = st.text_input("Ask a question about the podcast")
-    if user_question and st.session_state.docsearch:
+    if user_question:
+        if st.session_state.docsearch is None:
+            st.error("No aduio uploaded or recorded. Please upload an MP3 file or record audio first.")
+        else:
         # Query all stored vectors for relevant chunks
-        relevant_transcripts = query_vector_database(st.session_state.docsearch, user_question)
+            relevant_transcripts = query_vector_database(st.session_state.docsearch, user_question)
         
         # Generate a prompt for the GPT-4 model using the relevant transcripts
-        prompt = f"You are a helpful person whos job is to give answers from this and only this transcript:\n\n{relevant_transcripts}\n\nDo not answer based on any other knowledge, if the transcript does not contain information on the question, reply that it is not mentioned. Here is the question: Question: {user_question}"
+            prompt = f"You are a helpful person whose job is to give answers from this and only this transcript:\n\n{relevant_transcripts}\n\nDo not answer based on any other knowledge, if the transcript does not contain information on the question, reply that it is not mentioned. Here is the question: Question: {user_question}"
         
         # Get response from GPT-4
-        response = gpt4_chat_completion(prompt)
+            response = gpt4_chat_completion(prompt)
         
-        st.write(f"Response: {response}")
-        # Clear the input box by resetting the session state
+            st.write(f"Response: {response}")
 
-        #Live Transcription
-    st.write("Start recording and view live transcription. Stop recording when done.")
+# Initialize session state variable for recording if not already present
+    if "recording" not in st.session_state:
+        st.session_state.recording = False  # False means recording has not started
 
-        #Start/Stop button logic
-    if st.button("Stop Recording"):
-        stop_transcription()
+# Detect if the user presses either Start or Stop button
+    start_button = st.button("Start Recording")
+    stop_button = st.button("Stop Recording")
 
-    if st.button("Start Recording"):
-        start_transcription()
-    
+# Handle button presses
+    if start_button and not st.session_state.recording:
+        start_transcription()  # Start transcription process
+        st.session_state.recording = True  # Set recording state to True
+    elif stop_button and st.session_state.recording:
+        stop_transcription()  # Stop transcription process
+        st.session_state.recording = False  # Set recording state to False
+
+# Show the correct state
+
+
+
 with col2:
     if st.button("Summarize"):
-        st.write("### Summary:")
-        summary_transcripts = query_vector_database(st.session_state.docsearch, "Can you summarize the lecture")
-        summary_prompt = f"You are to give a summary of this transcript:\n\n{summary_transcripts}\n\n"
-        summary_response = gpt4_chat_completion(summary_prompt)
+        if st.session_state.docsearch is None:
+            st.error("No aduio uploaded or recorded. Please upload an MP3 file or record audio first.")
+        else:
+            st.write("### Summary:")
+            summary_transcripts = query_vector_database(st.session_state.docsearch, "Can you summarize the lecture")
+            summary_prompt = f"You are to give a summary of this transcript:\n\n{summary_transcripts}\n\n"
+            summary_response = gpt4_chat_completion(summary_prompt)
+            st.write(f"{summary_response}")
 
-        st.write(f"{summary_response}")
+# User query logic
