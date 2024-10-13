@@ -7,7 +7,13 @@ from podcast.speech_to_text import audio_to_text
 from podcast.embedding import store_embeddings
 from podcast.question_answer import query_vector_database
 from langchain.docstore.document import Document
+from live_audio_transcription.stream_audio import start_transcription, stop_transcription
 
+# custom imports
+from uiLayouts import *
+
+# Set page title and icon
+uiHeroSection()
 # Load environment variables from .env file
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -26,7 +32,10 @@ mp3_chunk_folder = "chunks"
 os.makedirs(mp3_file_folder, exist_ok=True)
 os.makedirs(mp3_chunk_folder, exist_ok=True)
 
-st.title("Podcast Q&A App")
+load_lottieurl("https://lottie.host/c328b028-512c-4d26-bfb4-3eadb686289a/zidbWrQeAG.json")
+with st.sidebar:
+        uiSidebarWorkingInfo()
+        uiSidebarInfo()
 
 # Upload audio file
 uploaded_file = st.file_uploader("Upload an MP3 file", type="mp3")
@@ -107,3 +116,15 @@ if user_question and st.session_state.docsearch:
     response = gpt4_chat_completion(prompt)
     
     st.write(f"Response: {response}")
+    # Clear the input box by resetting the session state
+
+    #Live Transcription
+st.write("Start recording and view live transcription. Stop recording when done.")
+
+    #Start/Stop button logic
+if st.button("Stop Recording"):
+    stop_transcription()
+
+if st.button("Start Recording"):
+    start_transcription()
+    
