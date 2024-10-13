@@ -62,13 +62,14 @@ def gpt4_chat_completion(prompt):
     )
     return response.choices[0].message.content
 
+translate_to_english = st.checkbox("Translate to English")
 # When a new file is uploaded, reset the session state for transcriptions and embeddings
 if uploaded_file is not None:
     # Check if the new file is different from the last processed file
-    if uploaded_file.name != st.session_state.last_uploaded_file:
-        st.session_state.transcriptions = []  # Reset transcriptions
-        st.session_state.docsearch = None  # Reset embeddings
-        st.session_state.last_uploaded_file = uploaded_file.name  # Update the last file
+    #if uploaded_file.name != st.session_state.last_uploaded_file:
+    st.session_state.transcriptions = []  # Reset transcriptions
+    st.session_state.docsearch = None  # Reset embeddings
+    st.session_state.last_uploaded_file = uploaded_file.name  # Update the last file
 
     # Save the uploaded file
     filepath = os.path.join(mp3_file_folder, uploaded_file.name)
@@ -88,7 +89,7 @@ if uploaded_file is not None:
             audio_chunk.write_audiofile(chunk_filename)
 
             # Process and transcribe each chunk using the speech-to-text function
-            transcription = audio_to_text(chunk_filename)
+            transcription = audio_to_text(chunk_filename, translate_to_english)
             st.session_state.transcriptions.append(transcription)  # Collect transcriptions
 
         # Combine all transcriptions into a single text
@@ -101,7 +102,17 @@ if uploaded_file is not None:
         documents = [Document(page_content=chunk) for chunk in transcription_chunks]
         st.session_state.docsearch = store_embeddings(documents)
 
-        st.write(f"Transcription: {combined_transcription[:500]}...")  # Show the first 500 characters
+        with st.expander("View FUll transcription"):
+            st.write(combined_transcription)
+        # st.write(f"Transcription: {combined_transcription[:500]}...")  # Show the first 500 characters
+
+if st.button("Summarize"):
+    st.write("### Summary:")
+    summary_transcripts = query_vector_database(st.session_state.docsearch, "Can you summarize the lecture")
+    summary_prompt = f"You are to give a summary of this transcript:\n\n{summary_transcripts}\n\n"
+    summary_response = gpt4_chat_completion(summary_prompt)
+
+    st.write(f"{summary_response}")
 
 # User query
 user_question = st.text_input("Ask a question about the podcast")
