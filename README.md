@@ -1,4 +1,4 @@
-# Podcast Transcription and Q&A Project
+# AudioInsight
 
 ## Overview 🎙️
 
@@ -46,6 +46,7 @@ cd <repository-folder>
 ### 2. Create and activate virtual environment
 
 #### Using venv (Python's built-in virtual environment)
+
 ```bash
 # Create virtual environment
 python -m venv venv
@@ -58,6 +59,7 @@ source venv/bin/activate
 ```
 
 #### Using conda
+
 ```bash
 # Create conda environment
 conda create -n venv python=3.12
@@ -80,6 +82,7 @@ streamlit run app.py
 ```
 
 ### 5. Usage
+
 Upload a podcast MP3 and interact with the transcription through the Q&A interface.
 
 ## Tech Stack 🛠️
@@ -96,6 +99,7 @@ Upload a podcast MP3 and interact with the transcription through the Q&A interfa
 ## Troubleshooting 🔍
 
 If you encounter any dependency-related issues:
+
 1. Make sure your virtual environment is activated
 2. Verify Python version compatibility: `python --version`
 3. Try upgrading pip: `pip install --upgrade pip`
@@ -118,6 +122,3 @@ The source code for the project is licensed under the MIT license, which you can
 - 📷 Instagram: [DataSciLearn](https://www.instagram.com/datascilearn/)
 - 📺 YouTube: [DataSciLearn](https://www.youtube.com/@DataSciLearn)
 - 📣 Telegram: [Join us on Telegram](https://t.me/datascilearn)
-
-
-
