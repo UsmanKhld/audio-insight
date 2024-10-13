@@ -2,7 +2,7 @@
 
 ## Overview 🎙️
 
-This project provides an end-to-end solution for processing podcast audio files and transforming them into interactive, searchable content. The pipeline allows users to upload a podcast MP3 file, converts it into text using Whisper, and then allows for question-answering using embeddings stored in Pinecone. The system provides seamless interaction with the podcast content, making it easier to navigate and extract valuable information.
+This groundbreaking project revolutionizes the way we interact with audio content. By seamlessly processing audio files and transforming them into searchable, interactive experiences, it opens up a world of possibilities. With the ability to convert podcast MP3 files into text using Whisper and offering question-answering through embeddings stored in Pinecone, this system empowers users to effortlessly engage with and extract valuable insights from podcast content. It's time to experience audio in a whole new way.
 
 ## Key Features ✨
 
@@ -118,7 +118,3 @@ The source code for the project is licensed under the MIT license, which you can
 5. Open a Pull Request
 
 ## Connect with Us
-
-- 📷 Instagram: [DataSciLearn](https://www.instagram.com/datascilearn/)
-- 📺 YouTube: [DataSciLearn](https://www.youtube.com/@DataSciLearn)
-- 📣 Telegram: [Join us on Telegram](https://t.me/datascilearn)
